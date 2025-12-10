@@ -204,28 +204,6 @@
         font-weight: bold;
         color: #222;
     }
-
-    /* Style spécifique pour les temps de fractionné */
-    .split-times {
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px dashed #ccc;
-    }
-    .split-times h4 {
-        margin-top: 0;
-        color: #333;
-        font-size: 1em;
-    }
-    .split-times table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .split-times td {
-        padding: 6px 0;
-        text-align: center;
-        border: none;
-        font-size: 15px;
-    }
   </style>
 </head>
 
@@ -269,10 +247,10 @@
 <div id="page2" class="page">
   <h2>Temps Séance</h2>
   <div class="input-group">
-    <label for="distance2">Distance d'une Répétition</label>
+    <label for="distance2">Distance</label>
     <div class="toggle-group">
       <div class="toggle-input">
-        <input id="distance2" type="number" value="400" />
+        <input id="distance2" type="number" value="1" />
       </div>
       <div class="toggle-input">
         <select id="unit2">
@@ -367,20 +345,6 @@ function secToTime(sec) {
     return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
-/** Convertit des secondes en format MM:SS.ms (pour les temps courts) */
-function secToMinSecMs(sec) {
-    if (sec <= 0 || isNaN(sec)) return "00:00.0";
-    const totalMs = Math.round(sec * 1000);
-    const ms = (totalMs % 1000).toString().padStart(3, "0");
-    const totalSec = Math.floor(totalMs / 1000);
-    const m = Math.floor(totalSec / 60);
-    const s = (totalSec % 60).toString().padStart(2, "0");
-    
-    // Simplification pour l'affichage (garde 1 décimale pour la piste)
-    const msSimplified = Math.round(Number('0.' + ms) * 10);
-    return `${m.toString().padStart(2, "0")}:${s}.${msSimplified}`;
-}
-
 /** Convertit une allure (s/km) en Vitesse (km/h) */
 function secPerKmToKmh(secPerKm) {
     if (secPerKm <= 0 || isNaN(secPerKm)) return 0;
@@ -405,7 +369,7 @@ function toggleSeanceInput(type) {
     document.getElementById('fields-vma').classList.toggle('hidden-fields', type === 'speed');
 }
 
-// --- 1. TEMPS DE PASSAGE COURSE (Inchangé) ---
+// --- 1. TEMPS DE PASSAGE COURSE (Fonctionnalité non modifiée) ---
 
 function calculCourse() {
     let distanceInput = document.getElementById("distance1").value;
@@ -462,7 +426,7 @@ function calculCourse() {
 }
 
 
-// --- 2. TEMPS DE PASSAGE SÉANCE (MISES À JOUR) ---
+// --- 2. TEMPS DE PASSAGE SÉANCE (Fonctionnalité non modifiée) ---
 
 function calculSeance() {
     let distanceInput = document.getElementById("distance2").value;
@@ -505,36 +469,18 @@ function calculSeance() {
     const speedKmhFinal = secPerKmToKmh(allureSecPerKm);
 
     let output = '<div class="result-section">';
-    output += `<h3>Résultats de la Répétition</h3>`;
+    output += `<h3>Résultats de la Séance</h3>`;
     output += `* Distance : ${distanceKm.toFixed(2)} km<br>`;
-    output += `* Allure au km : ${secPerKmToAllure(allureSecPerKm)} min/km<br>`;
+    output += `* Allure au km : ${secPerKmToAllure(allureSecPerKm)}/km<br>`;
     output += `* Vitesse : ${speedKmhFinal} km/h<br>`;
-    output += `* **Temps cible pour ${distanceKm.toFixed(2)} km : ${secToTime(totalSec)}**`;
-    output += '</div>';
-
-    // --- Nouveaux calculs pour 100m, 200m, 400m ---
-    
-    // Le temps par mètre est (Allure en secondes par km) / 1000
-    const secPerMeter = allureSecPerKm / 1000;
-
-    const time100m = secPerMeter * 100;
-    const time200m = secPerMeter * 200;
-    const time400m = secPerMeter * 400;
-
-    output += '<div class="result-section split-times">';
-    output += '<h4>Temps de passage pour le fractionné (par Répétition)</h4>';
-    output += '<table>';
-    output += `<tr><td>100m</td><td>${secToMinSecMs(time100m)}</td></tr>`;
-    output += `<tr><td>200m</td><td>${secToMinSecMs(time200m)}</td></tr>`;
-    output += `<tr><td>400m</td><td>${secToMinSecMs(time400m)}</td></tr>`;
-    output += '</table>';
+    output += `* Temps estimé pour cette séance : ${secToTime(totalSec)}`;
     output += '</div>';
 
     resDiv.innerHTML = output;
 }
 
 
-// --- 3. PRÉDICTION DE COURSE OU ZONES DE TRAVAIL (Inchangé) ---
+// --- 3. PRÉDICTION DE COURSE OU ZONES DE TRAVAIL (MISES À JOUR) ---
 
 function calculZones() {
     let vmaKmh = Number(document.getElementById("vma").value);
@@ -547,6 +493,7 @@ function calculZones() {
         return;
     }
 
+    // Mise à jour des FCmax et suppression des pourcentages dans les noms
     const zones = [
         { name: "Allure modérée / Récupération", vmaMin: 50, vmaMax: 60, fcMin: 60, fcMax: 65, color: "#4CAF50", distance: null }, 
         { name: "Endurance fondamentale", vmaMin: 60, vmaMax: 70, fcMin: 65, fcMax: 75, color: "#8BC34A", distance: null }, 
@@ -561,24 +508,32 @@ function calculZones() {
     output += `<p style="font-weight: bold; margin-bottom: 20px;">VMA : ${vmaKmh} km/h ${!isNaN(fcMax) && fcMax > 0 ? `, FCmax : ${fcMax} bpm` : ''}</p>`;
 
     zones.forEach(zone => {
+        // Calcul VMA
         const speedMin = vmaKmh * (zone.vmaMin / 100);
         const speedMax = vmaKmh * (zone.vmaMax / 100);
         
-        const secPerKmMaxSpeed = 3600 / speedMax; 
-        const secPerKmMinSpeed = 3600 / speedMin; 
+        // Allure (s/km)
+        const secPerKmMaxSpeed = 3600 / speedMax; // Allure la plus rapide (temps le plus faible)
+        const secPerKmMinSpeed = 3600 / speedMin; // Allure la plus lente (temps le plus élevé)
         
+        // Formattage des tranches
         const speedRange = `${speedMin.toFixed(1)} - ${speedMax.toFixed(1)} km/h`;
+        
+        // Ordre d'affichage: Allure la plus lente - Allure la plus rapide (temps le plus élevé -> temps le plus faible)
         const paceRange = `${secPerKmToAllure(secPerKmMinSpeed)} - ${secPerKmToAllure(secPerKmMaxSpeed)} min/km`;
         
         let fcRange = '';
         if (!isNaN(fcMax) && fcMax > 0) {
             const fcMin = Math.round(fcMax * (zone.fcMin / 100));
             const fcMaxBPM = Math.round(fcMax * (zone.fcMax / 100));
+            // Affichage: Tranche (XXX - YYY bpm)
             fcRange = `${fcMin} - ${fcMaxBPM} bpm`;
         }
 
+        // Prédiction de temps de course (uniquement pour les distances spécifiques)
         let timePrediction = '';
         if (zone.distance) {
+            // Temps le plus faible (vitesse max) -> Temps le plus élevé (vitesse min)
             const timeMinSec = zone.distance * secPerKmMaxSpeed;
             const timeMaxSec = zone.distance * secPerKmMinSpeed;
             timePrediction = `<p>Temps estimé : <span>${secToTime(timeMinSec)} - ${secToTime(timeMaxSec)}</span></p>`;
@@ -586,13 +541,22 @@ function calculZones() {
 
 
         output += `<div class="zone-item" style="border-left-color: ${zone.color};">`;
+        // Affichage du titre sans les % VMA
         output += `<div class="zone-title">${zone.name}</div>`;
         output += `<div class="zone-data">`;
+        
+        // Vitesse (afficher uniquement la tranche)
         output += `<p>Vitesse : <span>${speedRange}</span></p>`;
+        
+        // Allure (afficher ordre lent->rapide et min/km)
         output += `<p>Allure : <span>${paceRange}</span></p>`;
+        
+        // FC (afficher uniquement la tranche en bpm)
         if (fcRange) {
             output += `<p>FC : <span>${fcRange}</span></p>`;
         }
+        
+        // Temps estimé
         output += timePrediction;
         output += `</div></div>`;
     });
