@@ -1,177 +1,253 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2867
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+<label for="fcmax">FCmax (bpm) - Optionnel pour les zones de travail</label>
+    <input id="fcmax" type="number" placeholder="Ex: 190" />
 
-\f0\fs24 \cf0 <!DOCTYPE html>\
-<html lang="fr">\
-<head>\
-  <meta charset="UTF-8" />\
-  <meta name="viewport" content="width=device-width, initial-scale=1" />\
-  <title>Running PWA</title>\
-\
-  <link rel="manifest" href="manifest.json" />\
-  <meta name="theme-color" content="#FC4C02" />\
-\
-  <style>\
-    body \{\
-      margin: 0;\
-      font-family: Arial, sans-serif;\
-      background: #f5f5f5;\
-    \}\
-    header \{\
-      background: #FC4C02;\
-      color: white;\
-      padding: 15px;\
-      text-align: center;\
-      font-size: 20px;\
-      font-weight: bold;\
-    \}\
-    .tab-bar \{\
-      position: fixed;\
-      bottom: 0;\
-      width: 100%;\
-      display: flex;\
-      background: white;\
-      border-top: 1px solid #ccc;\
-    \}\
-    .tab \{\
-      flex: 1;\
-      text-align: center;\
-      padding: 10px;\
-      font-size: 14px;\
-      cursor: pointer;\
-    \}\
-    .tab.active \{\
-      color: #FC4C02;\
-      font-weight: bold;\
-    \}\
-    .page \{\
-      display: none;\
-      padding: 20px;\
-    \}\
-    .page.active \{\
-      display: block;\
-    \}\
-    input, select \{\
-      width: 100%;\
-      padding: 12px;\
-      margin: 10px 0;\
-      font-size: 16px;\
-    \}\
-    button \{\
-      padding: 12px;\
-      width: 100%;\
-      background: #FC4C02;\
-      border: none;\
-      color: white;\
-      font-size: 18px;\
-      margin-top: 10px;\
-      cursor: pointer;\
-    \}\
-    .result \{\
-      margin-top: 15px;\
-      padding: 15px;\
-      background: white;\
-      border-radius: 5px;\
-      font-size: 18px;\
-    \}\
-  </style>\
-</head>\
-\
-<body>\
-\
-<header>Running Calculator</header>\
-\
-<!-- PAGES -->\
-<div id="page1" class="page active">\
-  <h2>Temps de passage (course)</h2>\
-  <input id="distance1" type="number" placeholder="Distance (km)" />\
-  <input id="allure1" type="text" placeholder="Allure (min/km, ex: 5:00)" />\
-  <button onclick="calculCourse()">Calculer</button>\
-  <div id="res1" class="result"></div>\
-</div>\
-\
-<div id="page2" class="page">\
-  <h2>Temps s\'e9ance</h2>\
-  <input id="distance2" type="number" placeholder="Distance (km)" />\
-  <input id="allure2" type="text" placeholder="Allure (min/km)" />\
-  <button onclick="calculSeance()">Calculer</button>\
-  <div id="res2" class="result"></div>\
-</div>\
-\
-<div id="page3" class="page">\
-  <h2>Zones (\'e0 partir VMA)</h2>\
-  <input id="vma" type="number" placeholder="VMA (km/h)" />\
-  <button onclick="calculZones()">Calculer</button>\
-  <div id="res3" class="result"></div>\
-</div>\
-\
-<!-- TABS -->\
-<div class="tab-bar">\
-  <div class="tab active" onclick="switchTab(1)">Course</div>\
-  <div class="tab" onclick="switchTab(2)">S\'e9ance</div>\
-  <div class="tab" onclick="switchTab(3)">Zones</div>\
-</div>\
-\
-<script>\
-function switchTab(n) \{\
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));\
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));\
-  document.getElementById("page" + n).classList.add("active");\
-  document.querySelectorAll(".tab")[n-1].classList.add("active");\
-\}\
-\
-function allureToSec(a) \{\
-  let [m, s] = a.split(":").map(Number);\
-  return m * 60 + s;\
-\}\
-\
-function secToAllure(sec) \{\
-  let m = Math.floor(sec/60);\
-  let s = Math.floor(sec%60).toString().padStart(2, "0");\
-  return m + ":" + s;\
-\}\
-\
-function calculCourse() \{\
-  let d = Number(document.getElementById("distance1").value);\
-  let a = allureToSec(document.getElementById("allure1").value);\
-  let total = d * a;\
-  document.getElementById("res1").innerHTML =\
-    "Temps total : " + secToAllure(total);\
-\}\
-\
-function calculSeance() \{\
-  let d = Number(document.getElementById("distance2").value);\
-  let a = allureToSec(document.getElementById("allure2").value);\
-  let total = d * a;\
-  document.getElementById("res2").innerHTML =\
-    "Temps : " + secToAllure(total);\
-\}\
-\
-function calculZones() \{\
-  let vma = Number(document.getElementById("vma").value);\
-  function zone(pmin, pmax) \{\
-    return (vma * (pmin/100)).toFixed(1) + "\'96" + (vma * (pmax/100)).toFixed(1);\
-  \}\
-  document.getElementById("res3").innerHTML = `\
-    <b>R\'e9cup\'e9ration :</b> $\{zone(50,60)\} km/h<br><br>\
-    <b>Endurance fondamentale :</b> $\{zone(60,70)\} km/h<br><br>\
-    <b>Tempo :</b> $\{zone(70,75)\} km/h<br><br>\
-    <b>Marathon :</b> $\{zone(75,80)\} km/h<br><br>\
-    <b>Semi :</b> $\{zone(80,85)\} km/h<br><br>\
-    <b>10 km :</b> $\{zone(85,90)\} km/h<br><br>\
-    <b>5 km :</b> $\{zone(90,95)\} km/h\
-  `;\
-\}\
-\
-// Service worker\
-if ("serviceWorker" in navigator) \{\
-  navigator.serviceWorker.register("sw.js");\
-\}\
-</script>\
-\
-</body>\
-</html>}
+    <button onclick="calculZones()">Calculer</button>
+  </div>
+  <div id="res3" class="result"></div>
+</div>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab(1)">🏃 Course</div>
+  <div class="tab" onclick="switchTab(2)">⏱ Séance</div>
+  <div class="tab" onclick="switchTab(3)">📊 Zones</div>
+</div>
+
+<script>
+// --- UTILS DE CONVERSION ---
+
+/** Convertit une allure (min:sec) en secondes par km (s/km) */
+function allureToSecPerKm(allureStr) {
+  if (!allureStr.includes(':')) {
+      // Si c'est un nombre sans ':', on suppose que c'est une vitesse en km/h
+      const speed = Number(allureStr);
+      if (speed <= 0 || isNaN(speed)) return 0;
+      // Vitesse (km/h) -> Allure (min/km) : 60 / V
+      // Allure (min/km) -> Secondes/km : (60 / V) * 60
+      return (3600 / speed); // secondes par km
+  }
+  let [m, s] = allureStr.split(":").map(Number);
+  return (m * 60) + s; // secondes par km
+}
+
+/** Convertit des secondes par km (s/km) en allure (mm:ss) */
+function secPerKmToAllure(sec) {
+  if (sec <= 0 || isNaN(sec)) return "N/A";
+  let m = Math.floor(sec / 60);
+  let s = Math.floor(sec % 60).toString().padStart(2, "0");
+  return m + ":" + s;
+}
+
+/** Convertit des secondes totales en format H:MM:SS */
+function secToTime(sec) {
+    if (sec <= 0 || isNaN(sec)) return "00:00:00";
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = Math.floor(sec % 60);
+    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+}
+
+/** Convertit une allure (s/km) en Vitesse (km/h) */
+function secPerKmToKmh(secPerKm) {
+    if (secPerKm <= 0 || isNaN(secPerKm)) return 0;
+    return (3600 / secPerKm).toFixed(2);
+}
+
+// --- LOGIQUE DES ONGLETS ET AFFICHAGE ---
+
+function switchTab(n) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.getElementById("page" + n).classList.add("active");
+  document.querySelectorAll(".tab")[n-1].classList.add("active");
+  // Assurez-vous que l'affichage des champs Séance est correct lors du changement d'onglet
+  if (n === 2) {
+      const type = document.querySelector('input[name="seance-type"]:checked').value;
+      toggleSeanceInput(type);
+  }
+}
+
+function toggleSeanceInput(type) {
+    document.getElementById('fields-speed').classList.toggle('hidden-fields', type === 'vma');
+    document.getElementById('fields-vma').classList.toggle('hidden-fields', type === 'speed');
+}
+
+// --- 1. TEMPS DE PASSAGE COURSE ---
+
+function calculCourse() {
+    let distanceInput = document.getElementById("distance1").value;
+    let unit = document.getElementById("unit1").value;
+    let allureInput = document.getElementById("input-speed-pace1").value.trim();
+    let interval = Number(document.getElementById("pace-interval").value);
+    const resDiv = document.getElementById("res1");
+    resDiv.innerHTML = '';
+
+    let distanceKm = (unit === 'm') ? Number(distanceInput) / 1000 : Number(distanceInput);
+    let allureSecPerKm = allureToSecPerKm(allureInput);
+
+    if (isNaN(distanceKm) || distanceKm <= 0 || isNaN(allureSecPerKm) || allureSecPerKm <= 0) {
+        resDiv.innerHTML = "<p style='color:red;'>Veuillez saisir une distance et une allure/vitesse valides.</p>";
+        return;
+    }
+
+    const totalSec = distanceKm * allureSecPerKm;
+
+    let output = '<div class="result-section">';
+    output += `<h3>Récapitulatif de la course</h3>`;
+    output += `* **Distance totale :** ${distanceKm.toFixed(2)} km<br>`;
+    output += `* **Allure Kilométrique :** ${secPerKmToAllure(allureSecPerKm)}/km<br>`;
+    output += `* **Vitesse :** ${secPerKmToKmh(allureSecPerKm)} km/h<br>`;
+    output += `* **Temps total estimé :** **${secToTime(totalSec)}**</div>`;
+
+    // Calcul et affichage des temps de passage
+    output += '<div class="result-section">';
+    output += `<h3>Temps de passage (tous les ${interval} km)</h3>`;
+
+    let passages = '';
+    let cumulativeSec = 0;
+    let maxPassageKm = Math.floor(distanceKm / interval) * interval;
+
+    if (maxPassageKm > 0) {
+        passages += `<table class="passages-table"><thead><tr><th>Distance (km)</th><th>Temps cumulé</th></tr></thead><tbody>`;
+        for (let km = interval; km <= maxPassageKm; km += interval) {
+            cumulativeSec = km * allureSecPerKm;
+            passages += `<tr><td>${km}</td><td>${secToTime(cumulativeSec)}</td></tr>`;
+        }
+        
+        // Ajouter le temps final si la distance n'est pas un multiple de l'intervalle
+        if (distanceKm > maxPassageKm) {
+            passages += `<tr style="font-weight: bold;"><td>${distanceKm.toFixed(2)} (Total)</td><td>${secToTime(totalSec)}</td></tr>`;
+        }
+        passages += `</tbody></table>`;
+    } else {
+        // Afficher seulement le temps total si la distance est trop courte pour l'intervalle
+        passages += `<p>La distance est trop courte pour afficher des passages de ${interval} km. Temps total : **${secToTime(totalSec)}**</p>`;
+    }
+    output += passages + '</div>';
+
+    resDiv.innerHTML = output;
+}
+
+
+// --- 2. TEMPS DE PASSAGE SÉANCE ---
+
+function calculSeance() {
+    let distanceInput = document.getElementById("distance2").value;
+    let unit = document.getElementById("unit2").value;
+    let type = document.querySelector('input[name="seance-type"]:checked').value;
+    const resDiv = document.getElementById("res2");
+    resDiv.innerHTML = '';
+
+    let distanceKm = (unit === 'm') ? Number(distanceInput) / 1000 : Number(distanceInput);
+    let allureSecPerKm = 0;
+
+    if (isNaN(distanceKm) || distanceKm <= 0) {
+        resDiv.innerHTML = "<p style='color:red;'>Veuillez saisir une distance valide.</p>";
+        return;
+    }
+
+    if (type === 'speed') {
+        // Calcul à partir de Vitesse/Allure
+        let allureInput = document.getElementById("input-speed-pace2").value.trim();
+        allureSecPerKm = allureToSecPerKm(allureInput);
+
+        if (allureSecPerKm <= 0) {
+            resDiv.innerHTML = "<p style='color:red;'>Veuillez saisir une allure/vitesse valide.</p>";
+            return;
+        }
+
+    } else if (type === 'vma') {
+        // Calcul à partir de VMA et %VMA
+        let vmaKmh = Number(document.getElementById("vma-seance").value);
+        let percentVma = Number(document.getElementById("percent-vma-seance").value);
+
+        if (isNaN(vmaKmh) || vmaKmh <= 0 || isNaN(percentVma) || percentVma <= 0 || percentVma > 100) {
+            resDiv.innerHTML = "<p style='color:red;'>Veuillez saisir une VMA et un pourcentage VMA valides.</p>";
+            return;
+        }
+
+        let speedKmh = vmaKmh * (percentVma / 100);
+        allureSecPerKm = 3600 / speedKmh; // Allure en s/km
+
+    } else {
+        resDiv.innerHTML = "<p style='color:red;'>Erreur de sélection du type de calcul.</p>";
+        return;
+    }
+    
+    const totalSec = distanceKm * allureSecPerKm;
+
+    let output = '<div class="result-section">';
+    output += `<h3>Résultats de la Séance</h3>`;
+    output += `* **Distance :** ${distanceKm.toFixed(2)} km<br>`;
+    output += `* **Allure au km :** ${secPerKmToAllure(allureSecPerKm)}/km<br>`;
+    output += `* **Vitesse :** ${secPerKmToKmh(allureSecPerKm)} km/h<br>`;
+    output += `* **Temps estimé pour cette séance :** **${secToTime(totalSec)}**`;
+    output += '</div>';
+
+    resDiv.innerHTML = output;
+}
+
+// --- 3. PRÉDICTION DE COURSE OU ZONES DE TRAVAIL ---
+
+function calculZones() {
+    let vmaKmh = Number(document.getElementById("vma").value);
+    let fcMax = Number(document.getElementById("fcmax").value);
+    const resDiv = document.getElementById("res3");
+    resDiv.innerHTML = '';
+
+    if (isNaN(vmaKmh) || vmaKmh <= 0) {
+        resDiv.innerHTML = "<p style='color:red;'>Veuillez saisir une VMA valide (en km/h).</p>";
+        return;
+    }
+
+    const zones = [
+        { name: "Allure modérée / Récupération", vmaMin: 50, vmaMax: 60, fcMin: 60, fcMax: 65, color: "#4CAF50" }, // Vert
+        { name: "Endurance fondamentale", vmaMin: 60, vmaMax: 70, fcMin: 65, fcMax: 70, color: "#8BC34A" }, // Vert Clair
+        { name: "Endurance active / Tempo", vmaMin: 70, vmaMax: 75, fcMin: 75, fcMax: 80, color: "#FFC107" }, // Jaune
+        { name: "Marathon", vmaMin: 75, vmaMax: 80, fcMin: 80, fcMax: 83, color: "#FF9800" }, // Orange
+        { name: "Semi-marathon", vmaMin: 80, vmaMax: 85, fcMin: 82, fcMax: 85, color: "#FF5722" }, // Orange-Rouge
+        { name: "10km", vmaMin: 85, vmaMax: 90, fcMin: 85, fcMax: 90, color: "#F44336" }, // Rouge
+        { name: "5km", vmaMin: 90, vmaMax: 95, fcMin: 88, fcMax: 92, color: "#D32F2F" }  // Rouge Foncé
+    ];
+
+    let output = '<h3>Zones de Travail estimées</h3>';
+
+    zones.forEach(zone => {
+        // Calcul VMA
+        const speedMin = vmaKmh * (zone.vmaMin / 100);
+        const speedMax = vmaKmh * (zone.vmaMax / 100);
+        const paceMin = secPerKmToAllure(3600 / speedMax); // Plus vite = allure plus basse
+        const paceMax = secPerKmToAllure(3600 / speedMin); // Moins vite = allure plus haute
+        
+        let fcRange = '';
+        if (!isNaN(fcMax) && fcMax > 0) {
+            const fcMin = Math.round(fcMax * (zone.fcMin / 100));
+            const fcMaxBPM = Math.round(fcMax * (zone.fcMax / 100));
+            fcRange = ` (FC : ${fcMin}–${fcMaxBPM} bpm)`;
+        }
+
+        output += `<div class="result-section" style="border-left: 5px solid ${zone.color}; padding-left: 10px;">`;
+        output += `**${zone.name}**${fcRange}<br>`;
+        output += `* **VMA :** ${zone.vmaMin}% - ${zone.vmaMax}% (${speedMin.toFixed(1)}–${speedMax.toFixed(1)} km/h)<br>`;
+        output += `* **Allure :** **${paceMin}** - **${paceMax}**/km`;
+        output += `</div>`;
+    });
+
+    resDiv.innerHTML = output;
+}
+
+
+// --- INITIALISATION ---
+
+// Initialise l'affichage des champs de l'onglet Séance
+document.addEventListener('DOMContentLoaded', () => {
+    toggleSeanceInput('speed');
+});
+
+// Service worker (code inchangé)
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
+</script>
+
+</body>
+</html>
