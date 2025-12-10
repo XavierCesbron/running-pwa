@@ -1,0 +1,177 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 <!DOCTYPE html>\
+<html lang="fr">\
+<head>\
+  <meta charset="UTF-8" />\
+  <meta name="viewport" content="width=device-width, initial-scale=1" />\
+  <title>Running PWA</title>\
+\
+  <link rel="manifest" href="manifest.json" />\
+  <meta name="theme-color" content="#FC4C02" />\
+\
+  <style>\
+    body \{\
+      margin: 0;\
+      font-family: Arial, sans-serif;\
+      background: #f5f5f5;\
+    \}\
+    header \{\
+      background: #FC4C02;\
+      color: white;\
+      padding: 15px;\
+      text-align: center;\
+      font-size: 20px;\
+      font-weight: bold;\
+    \}\
+    .tab-bar \{\
+      position: fixed;\
+      bottom: 0;\
+      width: 100%;\
+      display: flex;\
+      background: white;\
+      border-top: 1px solid #ccc;\
+    \}\
+    .tab \{\
+      flex: 1;\
+      text-align: center;\
+      padding: 10px;\
+      font-size: 14px;\
+      cursor: pointer;\
+    \}\
+    .tab.active \{\
+      color: #FC4C02;\
+      font-weight: bold;\
+    \}\
+    .page \{\
+      display: none;\
+      padding: 20px;\
+    \}\
+    .page.active \{\
+      display: block;\
+    \}\
+    input, select \{\
+      width: 100%;\
+      padding: 12px;\
+      margin: 10px 0;\
+      font-size: 16px;\
+    \}\
+    button \{\
+      padding: 12px;\
+      width: 100%;\
+      background: #FC4C02;\
+      border: none;\
+      color: white;\
+      font-size: 18px;\
+      margin-top: 10px;\
+      cursor: pointer;\
+    \}\
+    .result \{\
+      margin-top: 15px;\
+      padding: 15px;\
+      background: white;\
+      border-radius: 5px;\
+      font-size: 18px;\
+    \}\
+  </style>\
+</head>\
+\
+<body>\
+\
+<header>Running Calculator</header>\
+\
+<!-- PAGES -->\
+<div id="page1" class="page active">\
+  <h2>Temps de passage (course)</h2>\
+  <input id="distance1" type="number" placeholder="Distance (km)" />\
+  <input id="allure1" type="text" placeholder="Allure (min/km, ex: 5:00)" />\
+  <button onclick="calculCourse()">Calculer</button>\
+  <div id="res1" class="result"></div>\
+</div>\
+\
+<div id="page2" class="page">\
+  <h2>Temps s\'e9ance</h2>\
+  <input id="distance2" type="number" placeholder="Distance (km)" />\
+  <input id="allure2" type="text" placeholder="Allure (min/km)" />\
+  <button onclick="calculSeance()">Calculer</button>\
+  <div id="res2" class="result"></div>\
+</div>\
+\
+<div id="page3" class="page">\
+  <h2>Zones (\'e0 partir VMA)</h2>\
+  <input id="vma" type="number" placeholder="VMA (km/h)" />\
+  <button onclick="calculZones()">Calculer</button>\
+  <div id="res3" class="result"></div>\
+</div>\
+\
+<!-- TABS -->\
+<div class="tab-bar">\
+  <div class="tab active" onclick="switchTab(1)">Course</div>\
+  <div class="tab" onclick="switchTab(2)">S\'e9ance</div>\
+  <div class="tab" onclick="switchTab(3)">Zones</div>\
+</div>\
+\
+<script>\
+function switchTab(n) \{\
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));\
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));\
+  document.getElementById("page" + n).classList.add("active");\
+  document.querySelectorAll(".tab")[n-1].classList.add("active");\
+\}\
+\
+function allureToSec(a) \{\
+  let [m, s] = a.split(":").map(Number);\
+  return m * 60 + s;\
+\}\
+\
+function secToAllure(sec) \{\
+  let m = Math.floor(sec/60);\
+  let s = Math.floor(sec%60).toString().padStart(2, "0");\
+  return m + ":" + s;\
+\}\
+\
+function calculCourse() \{\
+  let d = Number(document.getElementById("distance1").value);\
+  let a = allureToSec(document.getElementById("allure1").value);\
+  let total = d * a;\
+  document.getElementById("res1").innerHTML =\
+    "Temps total : " + secToAllure(total);\
+\}\
+\
+function calculSeance() \{\
+  let d = Number(document.getElementById("distance2").value);\
+  let a = allureToSec(document.getElementById("allure2").value);\
+  let total = d * a;\
+  document.getElementById("res2").innerHTML =\
+    "Temps : " + secToAllure(total);\
+\}\
+\
+function calculZones() \{\
+  let vma = Number(document.getElementById("vma").value);\
+  function zone(pmin, pmax) \{\
+    return (vma * (pmin/100)).toFixed(1) + "\'96" + (vma * (pmax/100)).toFixed(1);\
+  \}\
+  document.getElementById("res3").innerHTML = `\
+    <b>R\'e9cup\'e9ration :</b> $\{zone(50,60)\} km/h<br><br>\
+    <b>Endurance fondamentale :</b> $\{zone(60,70)\} km/h<br><br>\
+    <b>Tempo :</b> $\{zone(70,75)\} km/h<br><br>\
+    <b>Marathon :</b> $\{zone(75,80)\} km/h<br><br>\
+    <b>Semi :</b> $\{zone(80,85)\} km/h<br><br>\
+    <b>10 km :</b> $\{zone(85,90)\} km/h<br><br>\
+    <b>5 km :</b> $\{zone(90,95)\} km/h\
+  `;\
+\}\
+\
+// Service worker\
+if ("serviceWorker" in navigator) \{\
+  navigator.serviceWorker.register("sw.js");\
+\}\
+</script>\
+\
+</body>\
+</html>}
