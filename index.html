@@ -480,7 +480,7 @@ function calculSeance() {
 }
 
 
-// --- 3. PRÉDICTION DE COURSE OU ZONES DE TRAVAIL (MODIFIÉE) ---
+// --- 3. PRÉDICTION DE COURSE OU ZONES DE TRAVAIL (MISES À JOUR) ---
 
 function calculZones() {
     let vmaKmh = Number(document.getElementById("vma").value);
@@ -493,14 +493,15 @@ function calculZones() {
         return;
     }
 
+    // Mise à jour des FCmax et suppression des pourcentages dans les noms
     const zones = [
         { name: "Allure modérée / Récupération", vmaMin: 50, vmaMax: 60, fcMin: 60, fcMax: 65, color: "#4CAF50", distance: null }, 
-        { name: "Endurance fondamentale", vmaMin: 60, vmaMax: 70, fcMin: 65, fcMax: 70, color: "#8BC34A", distance: null }, 
-        { name: "Endurance active / Tempo", vmaMin: 70, vmaMax: 75, fcMin: 75, fcMax: 80, color: "#FFC107", distance: null }, 
-        { name: "Marathon", vmaMin: 75, vmaMax: 80, fcMin: 80, fcMax: 83, color: "#FF9800", distance: 42.195 }, 
-        { name: "Semi-marathon", vmaMin: 80, vmaMax: 85, fcMin: 82, fcMax: 85, color: "#FF5722", distance: 21.0975 }, 
-        { name: "10km", vmaMin: 85, vmaMax: 90, fcMin: 85, fcMax: 90, color: "#F44336", distance: 10 }, 
-        { name: "5km", vmaMin: 90, vmaMax: 95, fcMin: 88, fcMax: 92, color: "#D32F2F", distance: 5 } 
+        { name: "Endurance fondamentale", vmaMin: 60, vmaMax: 70, fcMin: 65, fcMax: 75, color: "#8BC34A", distance: null }, 
+        { name: "Endurance active / Tempo", vmaMin: 70, vmaMax: 75, fcMin: 75, fcMax: 85, color: "#FFC107", distance: null }, 
+        { name: "Marathon", vmaMin: 75, vmaMax: 80, fcMin: 80, fcMax: 85, color: "#FF9800", distance: 42.195 }, 
+        { name: "Semi-marathon", vmaMin: 80, vmaMax: 85, fcMin: 85, fcMax: 90, color: "#FF5722", distance: 21.0975 }, 
+        { name: "10km", vmaMin: 85, vmaMax: 90, fcMin: 90, fcMax: 93, color: "#F44336", distance: 10 }, 
+        { name: "5km", vmaMin: 90, vmaMax: 95, fcMin: 93, fcMax: 95, color: "#D32F2F", distance: 5 } 
     ];
 
     let output = '<h3>Zones de Travail estimées</h3>';
@@ -517,18 +518,22 @@ function calculZones() {
         
         // Formattage des tranches
         const speedRange = `${speedMin.toFixed(1)} - ${speedMax.toFixed(1)} km/h`;
-        const paceRange = `${secPerKmToAllure(secPerKmMaxSpeed)} - ${secPerKmToAllure(secPerKmMinSpeed)}/km`;
+        
+        // Ordre d'affichage: Allure la plus lente - Allure la plus rapide (temps le plus élevé -> temps le plus faible)
+        const paceRange = `${secPerKmToAllure(secPerKmMinSpeed)} - ${secPerKmToAllure(secPerKmMaxSpeed)} min/km`;
         
         let fcRange = '';
         if (!isNaN(fcMax) && fcMax > 0) {
             const fcMin = Math.round(fcMax * (zone.fcMin / 100));
             const fcMaxBPM = Math.round(fcMax * (zone.fcMax / 100));
+            // Affichage: Tranche (XXX - YYY bpm)
             fcRange = `${fcMin} - ${fcMaxBPM} bpm`;
         }
 
         // Prédiction de temps de course (uniquement pour les distances spécifiques)
         let timePrediction = '';
         if (zone.distance) {
+            // Temps le plus faible (vitesse max) -> Temps le plus élevé (vitesse min)
             const timeMinSec = zone.distance * secPerKmMaxSpeed;
             const timeMaxSec = zone.distance * secPerKmMinSpeed;
             timePrediction = `<p>Temps estimé : <span>${secToTime(timeMinSec)} - ${secToTime(timeMaxSec)}</span></p>`;
@@ -536,13 +541,22 @@ function calculZones() {
 
 
         output += `<div class="zone-item" style="border-left-color: ${zone.color};">`;
-        output += `<div class="zone-title">${zone.name} (${zone.vmaMin}-${zone.vmaMax}% VMA)</div>`;
+        // Affichage du titre sans les % VMA
+        output += `<div class="zone-title">${zone.name}</div>`;
         output += `<div class="zone-data">`;
+        
+        // Vitesse (afficher uniquement la tranche)
         output += `<p>Vitesse : <span>${speedRange}</span></p>`;
+        
+        // Allure (afficher ordre lent->rapide et min/km)
         output += `<p>Allure : <span>${paceRange}</span></p>`;
+        
+        // FC (afficher uniquement la tranche en bpm)
         if (fcRange) {
             output += `<p>FC : <span>${fcRange}</span></p>`;
         }
+        
+        // Temps estimé
         output += timePrediction;
         output += `</div></div>`;
     });
