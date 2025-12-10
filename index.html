@@ -1,3 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Running PWA Calculator</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#FC4C02" />
+
+  <style>
+    :root {
+      --strava-orange: #FC4C02;
+      --strava-light: #ff6628;
+      --strava-dark: #cc3c02;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding-bottom: 60px; /* Espace pour la barre de navigation */
+    }
+    header {
+      background: var(--strava-orange);
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      background: white;
+      border-top: 1px solid #ccc;
+      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+      z-index: 10;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px 10px;
+      font-size: 14px;
+      cursor: pointer;
+      color: #777;
+      transition: color 0.3s;
+    }
+    .tab.active {
+      color: var(--strava-orange);
+      font-weight: bold;
+      border-top: 3px solid var(--strava-orange);
+      margin-top: -3px;
+    }
+    .page {
+      display: none;
+      padding: 20px;
+      padding-bottom: 70px;
+    }
+    .page.active {
+      display: block;
+    }
+    .input-group {
+        background: white;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+        font-size: 14px;
+    }
+    input[type="number"], input[type="text"], select {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0 15px 0;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box; /* Important pour le padding et la border */
+    }
+    button {
+      padding: 12px;
+      width: 100%;
+      background: var(--strava-orange);
+      border: none;
+      color: white;
+      font-size: 18px;
+      margin-top: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+        background: var(--strava-light);
+    }
+    .result {
+      margin-top: 25px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      font-size: 16px;
+      line-height: 1.6;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .result-section {
+        margin-bottom: 15px;
+        padding: 10px 0;
+        border-bottom: 1px dashed #eee;
+    }
+    .result-section:last-child {
+        border-bottom: none;
+    }
+    .result h3 {
+        color: var(--strava-orange);
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 1.2em;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 5px;
+    }
+    .toggle-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    .toggle-input {
+        flex: 1;
+    }
+    .radio-container {
+      display: flex;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .radio-label {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      background-color: #f9f9f9;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .radio-input:checked + .radio-label {
+      background-color: var(--strava-orange);
+      color: white;
+      border: none;
+    }
+    .radio-input {
+      display: none;
+    }
+    .hidden-fields {
+        display: none;
+        margin-top: 10px;
+    }
+    .sub-section-title {
+        font-weight: bold;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        color: #555;
+    }
+    .passages-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+    .passages-table th, .passages-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+    .passages-table th {
+        background-color: #f0f0f0;
+        color: #333;
+    }
+    .passages-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>Running Calculator</header>
+
+<div id="page1" class="page active">
+  <h2>Temps de passage (Course)</h2>
+  <div class="input-group">
+    <label for="distance1">Distance</label>
+    <div class="toggle-group">
+      <div class="toggle-input">
+        <input id="distance1" type="number" value="10" />
+      </div>
+      <div class="toggle-input">
+        <select id="unit1">
+          <option value="km">km</option>
+          <option value="m">m</option>
+        </select>
+      </div>
+    </div>
+    
+    <label for="input-speed-pace1">Vitesse (km/h) ou Allure (min/km)</label>
+    <input id="input-speed-pace1" type="text" placeholder="Ex: 12 (km/h) ou 5:00 (min/km)" />
+
+    <label for="pace-interval">Affichage des passages tous les (km)</label>
+    <select id="pace-interval">
+        <option value="1">1 km</option>
+        <option value="2">2 km</option>
+        <option value="3">3 km</option>
+        <option value="5">5 km</option>
+        <option value="10">10 km</option>
+    </select>
+
+    <button onclick="calculCourse()">Calculer</button>
+  </div>
+  <div id="res1" class="result"></div>
+</div>
+
+<div id="page2" class="page">
+  <h2>Temps Séance</h2>
+  <div class="input-group">
+    <label for="distance2">Distance</label>
+    <div class="toggle-group">
+      <div class="toggle-input">
+        <input id="distance2" type="number" value="1" />
+      </div>
+      <div class="toggle-input">
+        <select id="unit2">
+          <option value="km">km</option>
+          <option value="m">m</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="radio-container">
+        <input type="radio" id="seance-type-speed" name="seance-type" value="speed" checked class="radio-input" onchange="toggleSeanceInput('speed')">
+        <label for="seance-type-speed" class="radio-label">Vitesse/Allure</label>
+
+        <input type="radio" id="seance-type-vma" name="seance-type" value="vma" class="radio-input" onchange="toggleSeanceInput('vma')">
+        <label for="seance-type-vma" class="radio-label">VMA / %VMA</label>
+    </div>
+
+    <div id="fields-speed" class="fields-container">
+        <label for="input-speed-pace2">Vitesse (km/h) ou Allure (min/km)</label>
+        <input id="input-speed-pace2" type="text" placeholder="Ex: 14 (km/h) ou 4:17 (min/km)" />
+    </div>
+
+    <div id="fields-vma" class="fields-container hidden-fields">
+        <label for="vma-seance">VMA (km/h)</label>
+        <input id="vma-seance" type="number" placeholder="Ex: 18" />
+        
+        <label for="percent-vma-seance">Pourcentage de réalisation VMA (%)</label>
+        <input id="percent-vma-seance" type="number" placeholder="Ex: 85" min="1" max="100" />
+    </div>
+
+    <button onclick="calculSeance()">Calculer</button>
+  </div>
+  <div id="res2" class="result"></div>
+</div>
+
+<div id="page3" class="page">
 <label for="fcmax">FCmax (bpm) - Optionnel pour les zones de travail</label>
     <input id="fcmax" type="number" placeholder="Ex: 190" />
 
