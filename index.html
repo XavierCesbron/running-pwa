@@ -3,202 +3,221 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Running App</title>
-
+<title>Running Calculator</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#FC4C02">
-
 <style>
-body {
+body{
     margin:0;
-    font-family: Arial, sans-serif;
+    font-family:Arial, sans-serif;
     background:#111;
     color:white;
 }
-
-header {
+header{
     background:#FC4C02;
     padding:15px;
     text-align:center;
     font-size:20px;
     font-weight:bold;
 }
-
-.tabs {
-    display:flex;
-    background:#1c1c1c;
-}
-
-.tab {
-    flex:1;
-    padding:12px;
-    text-align:center;
-    cursor:pointer;
-    border-bottom:3px solid transparent;
-}
-
-.tab.active {
-    border-bottom:3px solid #FC4C02;
-    font-weight:bold;
-}
-
-.section {
-    display:none;
+.container{
     padding:20px;
+    margin-bottom:80px;
 }
-
-.section.active {
-    display:block;
-}
-
-input, button {
+input,button{
     width:100%;
     padding:10px;
     margin:8px 0;
+    border-radius:8px;
     border:none;
-    border-radius:6px;
     font-size:16px;
 }
-
-button {
+button{
     background:#FC4C02;
     color:white;
     font-weight:bold;
 }
-
-.zone-item {
-    background:#1e1e1e;
+.result{
+    margin-top:10px;
+    font-size:18px;
+}
+.nav{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:#222;
+    display:flex;
+}
+.nav button{
+    flex:1;
+    background:none;
+    color:white;
+    border:none;
     padding:15px;
+}
+.active{
+    background:#FC4C02 !important;
+}
+.tab{display:none;}
+.zone-item{
+    background:#1c1c1c;
     margin:10px 0;
-    border-left:6px solid;
-    border-radius:6px;
+    padding:10px;
+    border-left:5px solid #FC4C02;
+    border-radius:8px;
+}
+.zone-title{
+    font-weight:bold;
+    margin-bottom:5px;
 }
 </style>
 </head>
-
 <body>
 
-<header>🏃 Running Calculator</header>
+<header>Running Calculator</header>
 
-<div class="tabs">
-    <div class="tab active" onclick="showTab(0)">Conversions</div>
-    <div class="tab" onclick="showTab(1)">Allure</div>
-    <div class="tab" onclick="showTab(2)">VMA</div>
-</div>
+<div class="container">
 
 <!-- CONVERSIONS -->
-<div class="section active">
-    <h3>Conversion vitesse ↔ allure</h3>
-    <input type="number" id="speed" placeholder="Vitesse (km/h)">
-    <button onclick="speedToPace()">Convertir en allure</button>
-    <div id="res1"></div>
+<div id="tab1" class="tab">
+<h3>Conversions</h3>
+<input type="number" id="kmh" placeholder="Vitesse km/h">
+<button onclick="convert()">Convertir en allure</button>
+<div id="res1" class="result"></div>
 </div>
 
-<!-- ALLURE -->
-<div class="section">
-    <h3>Calcul temps sur distance</h3>
-    <input type="number" id="distance" placeholder="Distance (km)">
-    <input type="number" id="paceMin" placeholder="Allure min/km (ex: 5.30)">
-    <button onclick="calculateTime()">Calculer temps</button>
-    <div id="res2"></div>
+<!-- CALCUL -->
+<div id="tab2" class="tab">
+<h3>Calcul allure / temps</h3>
+<input type="number" id="distance" placeholder="Distance (km)">
+<input type="number" id="vitesse" placeholder="Vitesse (km/h)">
+<button onclick="calculTemps()">Calculer temps</button>
+<div id="res2" class="result"></div>
+</div>
+
+<!-- TEMPS DE PASSAGE -->
+<div id="tab3" class="tab">
+<h3>Temps de passage</h3>
+<input type="number" id="tp_distance" placeholder="Distance totale (km)">
+<input type="number" id="tp_vitesse" placeholder="Vitesse (km/h)">
+<input type="number" id="tp_split" placeholder="Split (km)">
+<button onclick="calculPassage()">Calculer</button>
+<div id="res_passage" class="result"></div>
 </div>
 
 <!-- VMA -->
-<div class="section">
-    <h3>Zones VMA & prédictions</h3>
-    <input type="number" id="vma" placeholder="VMA (km/h)">
-    <input type="number" id="fcmax" placeholder="FC max (optionnel)">
-    <button onclick="calculZones()">Calculer</button>
-    <div id="res3"></div>
+<div id="tab4" class="tab">
+<h3>Zones VMA</h3>
+<input type="number" id="vma" placeholder="VMA (km/h)">
+<input type="number" id="fcmax" placeholder="FC max (optionnel)">
+<button onclick="calculZones()">Calculer</button>
+<div id="res3"></div>
+</div>
+
+</div>
+
+<!-- NAVIGATION -->
+<div class="nav">
+<button onclick="showTab(1,this)">Conversions</button>
+<button onclick="showTab(2,this)">Calcul</button>
+<button onclick="showTab(3,this)">Passage</button>
+<button onclick="showTab(4,this)">VMA</button>
 </div>
 
 <script>
+function showTab(n,el){
+    document.querySelectorAll(".tab").forEach(t=>t.style.display="none");
+    document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+    document.getElementById("tab"+n).style.display="block";
+    el.classList.add("active");
+}
+showTab(1,document.querySelector(".nav button"));
 
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
+function convert(){
+    let v=parseFloat(document.getElementById("kmh").value);
+    if(!v) return;
+    let sec=3600/v;
+    document.getElementById("res1").innerHTML=
+    "Allure : "+secPerKmToAllure(sec)+" min/km";
 }
 
-function showTab(index){
-    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-    document.querySelectorAll(".tab")[index].classList.add("active");
-    document.querySelectorAll(".section")[index].classList.add("active");
+function calculTemps(){
+    let d=parseFloat(document.getElementById("distance").value);
+    let v=parseFloat(document.getElementById("vitesse").value);
+    if(!d||!v) return;
+    let time=d*(3600/v);
+    document.getElementById("res2").innerHTML=
+    "Temps : "+secToTime(time);
 }
 
-function speedToPace(){
-    let speed = parseFloat(document.getElementById("speed").value);
-    if(!speed) return;
-    let paceSec = 3600/speed;
-    document.getElementById("res1").innerHTML =
-        "Allure : " + secPerKmToAllure(paceSec);
-}
-
-function calculateTime(){
-    let d = parseFloat(document.getElementById("distance").value);
-    let pace = parseFloat(document.getElementById("paceMin").value);
-    if(!d || !pace) return;
-
-    let minutes = Math.floor(pace);
-    let seconds = Math.round((pace - minutes)*100);
-
-    let totalSec = d*(minutes*60 + seconds);
-    document.getElementById("res2").innerHTML =
-        "Temps estimé : " + secToTime(totalSec);
+function calculPassage(){
+    let d=parseFloat(document.getElementById("tp_distance").value);
+    let v=parseFloat(document.getElementById("tp_vitesse").value);
+    let split=parseFloat(document.getElementById("tp_split").value);
+    if(!d||!v||!split) return;
+    let allure=3600/v;
+    let passage=split*allure;
+    document.getElementById("res_passage").innerHTML=
+    "Temps au "+split+" km : "+secToTime(passage);
 }
 
 function calculZones(){
-    let vma = parseFloat(document.getElementById("vma").value);
-    let fc = parseFloat(document.getElementById("fcmax").value);
+    let vma=parseFloat(document.getElementById("vma").value);
+    let fc=parseFloat(document.getElementById("fcmax").value);
     if(!vma) return;
 
-    const zones = [
-        { name:"Marathon", min:75, max:80, fmin:80, fmax:85, c:"#FF9800", d:42.195 },
-        { name:"Semi-marathon", min:80, max:85, fmin:85, fmax:90, c:"#FF5722", d:21.097 },
-        { name:"10 km", min:85, max:90, fmin:90, fmax:93, c:"#F44336", d:10 },
-        { name:"5 km", min:90, max:95, fmin:93, fmax:95, c:"#D32F2F", d:5 }
+    const zones=[
+        {name:"Récupération",min:50,max:60,fmin:60,fmax:65},
+        {name:"Endurance fondamentale",min:60,max:70,fmin:65,fmax:75},
+        {name:"Marathon",min:75,max:80,fmin:80,fmax:85,d:42.195},
+        {name:"Semi-marathon",min:80,max:85,fmin:85,fmax:90,d:21.097},
+        {name:"10 km",min:85,max:90,fmin:90,fmax:93,d:10},
+        {name:"5 km",min:90,max:95,fmin:93,fmax:95,d:5}
     ];
 
     let output="";
 
     zones.forEach(z=>{
-        let sMin = vma*z.min/100;
-        let sMax = vma*z.max/100;
+        let sMin=vma*z.min/100;
+        let sMax=vma*z.max/100;
 
-        let aMin = 3600/sMin;
-        let aMax = 3600/sMax;
+        let aMin=3600/sMin;
+        let aMax=3600/sMax;
 
-        let timeMax = (z.d/sMin)*3600;
-        let timeMin = (z.d/sMax)*3600;
-
-        output += `<div class="zone-item" style="border-left-color:${z.c}">
-            <strong>${z.name}</strong>
-            <p>Vitesse : ${sMin.toFixed(1)} - ${sMax.toFixed(1)} km/h</p>
-            <p>Allure : ${secPerKmToAllure(aMin)} - ${secPerKmToAllure(aMax)}</p>`;
+        output+=`
+        <div class="zone-item">
+        <div class="zone-title">${z.name}</div>
+        <p>Vitesse : ${sMin.toFixed(1)} - ${sMax.toFixed(1)} km/h</p>
+        <p>Allure : ${secPerKmToAllure(aMin)} - ${secPerKmToAllure(aMax)}</p>`;
 
         if(fc){
-            output += `<p>FC : ${Math.round(fc*z.fmin/100)} - ${Math.round(fc*z.fmax/100)} bpm</p>`;
+            output+=`<p>FC : ${Math.round(fc*z.fmin/100)} - ${Math.round(fc*z.fmax/100)} bpm</p>`;
         }
 
-        output += `<p><strong>Temps estimé :</strong> ${secToTime(timeMax)} → ${secToTime(timeMin)}</p>
-        </div>`;
+        if(z.d){
+            let timeMax=z.d*aMin;
+            let timeMin=z.d*aMax;
+            output+=`<p>Temps estimé : ${secToTime(timeMax)} - ${secToTime(timeMin)}</p>`;
+        }
+
+        output+=`</div>`;
     });
 
-    document.getElementById("res3").innerHTML = output;
+    document.getElementById("res3").innerHTML=output;
 }
 
 function secPerKmToAllure(sec){
-    let m = Math.floor(sec/60);
-    let s = Math.round(sec%60);
-    return m + "m" + (s<10?"0":"") + s + "s/km";
+    let m=Math.floor(sec/60);
+    let s=Math.round(sec%60);
+    if(s<10) s="0"+s;
+    return m+":"+s;
 }
 
 function secToTime(sec){
-    let h = Math.floor(sec/3600);
-    let m = Math.floor((sec%3600)/60);
-    let s = Math.round(sec%60);
+    let h=Math.floor(sec/3600);
+    let m=Math.floor((sec%3600)/60);
+    let s=Math.round(sec%60);
     return h+"h "+m+"m "+s+"s";
 }
-
 </script>
 
 </body>
