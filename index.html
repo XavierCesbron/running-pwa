@@ -243,15 +243,15 @@ function secPerKmToAllure(sec) {
   if (sec <= 0) return "0:00";
   let m = Math.floor(sec / 60);
   let s = Math.floor(sec % 60).toString().padStart(2, "0");
-  return ${m}:${s};
+  return `${m}:${s}`;
 }
 
 function secToTime(sec) {
     let h = Math.floor(sec / 3600);
     let m = Math.floor((sec % 3600) / 60);
     let s = Math.floor(sec % 60);
-    if (h > 0) return ${h}h ${m.toString().padStart(2,"0")}m ${s.toString().padStart(2,"0")}s;
-    return ${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")};
+    if (h > 0) return `${h}h ${m.toString().padStart(2,"0")}m ${s.toString().padStart(2,"0")}s`;
+    return `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
 }
 
 // --- TABS ---
@@ -267,7 +267,7 @@ function toggleSeanceInput(type) {
     document.getElementById('fields-vma').style.display = (type === 'vma') ? 'block' : 'none';
 }
 
-// --- CALCUL LIBRE (LOGIQUE 2/3) ---
+// --- CALCUL LIBRE ---
 function calculLibre() {
     let distVal = document.getElementById("calc-dist").value;
     let unitDist = document.getElementById("calc-unit-dist").value;
@@ -298,11 +298,11 @@ function calculLibre() {
         return;
     }
 
-    res.innerHTML = <h3>Résultat : ${found} calculé</h3>
+    res.innerHTML = `<h3>Résultat : ${found} calculé</h3>
         <b>Distance :</b> ${d.toFixed(2)} km<br>
         <b>Temps :</b> ${secToTime(t)}<br>
         <b>Allure :</b> ${secPerKmToAllure(p)} min/km<br>
-        <b>Vitesse :</b> ${(3600/p).toFixed(2)} km/h;
+        <b>Vitesse :</b> ${(3600/p).toFixed(2)} km/h`;
 }
 
 function clearCalcLibre() {
@@ -310,17 +310,17 @@ function clearCalcLibre() {
     document.getElementById("res-libre").innerHTML = "";
 }
 
-// --- AUTRES CALCULS (Inchangés mais simplifiés pour la version) ---
+// --- AUTRES CALCULS ---
 function calculCourse() {
     let dist = parseFloat(document.getElementById("distance1").value);
     if (document.getElementById("unit1").value === 'm') dist /= 1000;
     let allureSec = allureToSecPerKm(document.getElementById("input-speed-pace1").value);
     let interval = parseInt(document.getElementById("pace-interval").value);
     if (!dist || !allureSec) return;
-    let output = <div class="result-section"><h3>Total : ${secToTime(dist * allureSec)}</h3>
-        Vitesse : ${(3600/allureSec).toFixed(1)} km/h | Allure : ${secPerKmToAllure(allureSec)}</div>;
-    output += <table class="passages-table"><tr><th>km</th><th>Temps</th></tr>;
-    for(let i=interval; i<=dist; i+=interval) { output += <tr><td>${i}</td><td>${secToTime(i * allureSec)}</td></tr>; }
+    let output = `<div class="result-section"><h3>Total : ${secToTime(dist * allureSec)}</h3>
+        Vitesse : ${(3600/allureSec).toFixed(1)} km/h | Allure : ${secPerKmToAllure(allureSec)}</div>`;
+    output += `<table class="passages-table"><tr><th>km</th><th>Temps</th></tr>`;
+    for(let i=interval; i<=dist; i+=interval) { output += `<tr><td>${i}</td><td>${secToTime(i * allureSec)}</td></tr>`; }
     document.getElementById("res1").innerHTML = output + "</table>";
 }
 
@@ -337,15 +337,16 @@ function calculSeance() {
     }
     if (!dist || !allureSec) return;
     let total = (dist / 1000) * allureSec;
-    let output = <div class="result-section"><h3>Cible : ${secToTime(total)}</h3>
-        Vitesse : ${(3600/allureSec).toFixed(1)} km/h</div><table class="passages-table">;
+    let output = `<div class="result-section"><h3>Cible : ${secToTime(total)}</h3>
+        Vitesse : ${(3600/allureSec).toFixed(1)} km/h</div><table class="passages-table">`;
     [100, 200, 300, 400].forEach(d => {
         let s = (d/1000) * allureSec;
-        output += <tr><td>${d}m</td><td>${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,"0")}.${Math.floor((s%1)*10)}</td></tr>;
+        output += `<tr><td>${d}m</td><td>${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,"0")}.${Math.floor((s%1)*10)}</td></tr>`;
     });
     document.getElementById("res2").innerHTML = output + "</table>";
 }
 
+// --- ZONES DE TRAVAIL ---
 function calculZones() {
     let vma = parseFloat(document.getElementById("vma").value);
     let fc = parseFloat(document.getElementById("fcmax").value);
@@ -362,41 +363,20 @@ function calculZones() {
     ];
 
     let output = "";
-
     zones.forEach(z => {
-
-        let sMin = vma * z.min / 100;
-        let sMax = vma * z.max / 100;
-
-        let aMin = 3600 / sMin;
-        let aMax = 3600 / sMax;
-
-        output += `<div class="zone-item" style="border-left-color:${z.c}">
-        <div class="zone-title">${z.name}</div>
-        <div class="zone-data">
-        <p>Vitesse : <span>${sMin.toFixed(1)} - ${sMax.toFixed(1)} km/h</span></p>
-        <p>Allure : <span>${secPerKmToAllure(aMin)} - ${secPerKmToAllure(aMax)} min/km</span></p>`;
-
-        if (fc) {
-            output += `<p>FC : <span>${Math.round(fc*z.fmin/100)} - ${Math.round(fc*z.fmax/100)} bpm</span></p>`;
-        }
-
-        // 🔹 AJOUT UNIQUEMENT POUR LES DISTANCES COURSE
-        if (z.d) {
-
-            let timeMax = z.d * aMin; // vitesse la plus basse
-            let timeMin = z.d * aMax; // vitesse la plus haute
-
-            output += `<p>Temps estimé : <span>${secToTime(timeMax)} - ${secToTime(timeMin)}</span></p>`;
-        }
-
+        let sMin = vma * z.min / 100, sMax = vma * z.max / 100;
+        let aMin = 3600 / sMin, aMax = 3600 / sMax;
+        // inversion : afficher le temps maximal en premier
+        output += `<div class="zone-item" style="border-left-color:${z.c}"><div class="zone-title">${z.name}</div>`;
+        output += `<div class="zone-data"><p>Vitesse : <span>${sMin.toFixed(1)}-${sMax.toFixed(1)} km/h</span></p>`;
+        output += `<p>Allure : <span>${secPerKmToAllure(aMax)}-${secPerKmToAllure(aMin)} min/km</span></p>`;
+        if (fc) output += `<p>FC : <span>${Math.round(fc*z.fmin/100)}-${Math.round(fc*z.fmax/100)} bpm</span></p>`;
         output += `</div></div>`;
     });
-
     document.getElementById("res3").innerHTML = output;
 }
 
-// Service Worker (Auto-update)
+// --- SERVICE WORKER (auto-update) ---
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").then(reg => {
     reg.onupdatefound = () => {
@@ -412,3 +392,4 @@ if ("serviceWorker" in navigator) {
 </script>
 </body>
 </html>
+         
