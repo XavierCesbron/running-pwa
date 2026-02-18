@@ -159,11 +159,11 @@ function secToTime(sec){
     let h = Math.floor(sec/3600);
     let m = Math.floor((sec%3600)/60);
     let s = Math.floor(sec%60);
-    if(h>0) return `${h}h ${m.toString().padStart(2,"0")}m ${s.toString().padStart(2,"0")}s`;
-    return `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+    if(h>0) return h + "h " + m.toString().padStart(2,"0") + "m " + s.toString().padStart(2,"0") + "s";
+    return m.toString().padStart(2,"0") + ":" + s.toString().padStart(2,"0");
 }
 
-// --- Onglet Zones uniquement modifié ---
+// --- Onglet Zones uniquement ---
 function calculZones() {
     let vma = parseFloat(document.getElementById("vma").value);
     let fc = parseFloat(document.getElementById("fcmax").value);
@@ -181,20 +181,24 @@ function calculZones() {
 
     let output = "";
     zones.forEach(z => {
-        let sMin = vma * z.min / 100, sMax = vma * z.max / 100;
-        let aMin = 3600 / sMin, aMax = 3600 / sMax;
-        output += `<div class="zone-item" style="border-left-color:${z.c}"><div class="zone-title">${z.name}</div>`;
-        output += `<div class="zone-data"><p>Vitesse : <span>${sMin.toFixed(1)}-${sMax.toFixed(1)} km/h</span></p>`;
+        let sMin = vma * z.min / 100;
+        let sMax = vma * z.max / 100;
+        let aMin = 3600 / sMin;
+        let aMax = 3600 / sMax;
+        output += '<div class="zone-item" style="border-left-color:' + z.c + '"><div class="zone-title">' + z.name + '</div>';
+        output += '<div class="zone-data"><p>Vitesse : <span>' + sMin.toFixed(1) + '-' + sMax.toFixed(1) + ' km/h</span></p>';
+
         if(z.d){
             // temps maximal en premier, minimal en second
             let tMax = aMax * z.d;
             let tMin = aMin * z.d;
-            output += `<p>Temps : <span>${secToTime(tMax)} - ${secToTime(tMin)}</span></p>`;
+            output += '<p>Temps : <span>' + secToTime(tMax) + ' - ' + secToTime(tMin) + '</span></p>';
         } else {
-            output += `<p>Allure : <span>${secPerKmToAllure(aMax)}-${secPerKmToAllure(aMin)} min/km</span></p>`;
+            output += '<p>Allure : <span>' + secPerKmToAllure(aMax) + '-' + secPerKmToAllure(aMin) + ' min/km</span></p>';
         }
-        if(fc) output += `<p>FC : <span>${Math.round(fc*z.fmin/100)}-${Math.round(fc*z.fmax/100)} bpm</span></p>`;
-        output += `</div></div>`;
+
+        if(fc) output += '<p>FC : <span>' + Math.round(fc*z.fmin/100) + '-' + Math.round(fc*z.fmax/100) + ' bpm</span></p>';
+        output += '</div></div>';
     });
 
     document.getElementById("res3").innerHTML = output;
