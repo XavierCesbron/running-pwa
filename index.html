@@ -116,7 +116,17 @@
 
 <header>Running Calculator</header>
 
-<!-- Onglets existants ici (page1, page2, page3) inchangés -->
+<div id="page1" class="page active">
+  <!-- contenu inchangé -->
+</div>
+
+<div id="page2" class="page">
+  <!-- contenu inchangé -->
+</div>
+
+<div id="page3" class="page">
+  <!-- contenu inchangé -->
+</div>
 
 <div id="page4" class="page">
   <h2>Zones de Travail</h2>
@@ -145,6 +155,14 @@ function secPerKmToAllure(sec) {
     return m + ":" + s;
 }
 
+function secToTime(sec){
+    let h = Math.floor(sec/3600);
+    let m = Math.floor((sec%3600)/60);
+    let s = Math.floor(sec%60);
+    if(h>0) return `${h}h ${m.toString().padStart(2,"0")}m ${s.toString().padStart(2,"0")}s`;
+    return `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+}
+
 function calculZones() {
     let vma = parseFloat(document.getElementById("vma").value);
     let fc = parseFloat(document.getElementById("fcmax").value);
@@ -166,10 +184,10 @@ function calculZones() {
         let aMin = 3600 / sMin, aMax = 3600 / sMax;
         output += `<div class="zone-item" style="border-left-color:${z.c}"><div class="zone-title">${z.name}</div>`;
         output += `<div class="zone-data"><p>Vitesse : <span>${sMin.toFixed(1)}-${sMax.toFixed(1)} km/h</span></p>`;
-        // Temps maximal en premier
-        if(z.d){ // uniquement pour marathon, semi, 10km, 5km
+        if(z.d){
             let tMax = aMax * z.d;
             let tMin = aMin * z.d;
+            // inversion temps: maximal en premier, minimal en second
             output += `<p>Temps : <span>${secToTime(tMax)} - ${secToTime(tMin)}</span></p>`;
         } else {
             output += `<p>Allure : <span>${secPerKmToAllure(aMax)}-${secPerKmToAllure(aMin)} min/km</span></p>`;
@@ -179,14 +197,6 @@ function calculZones() {
     });
 
     document.getElementById("res3").innerHTML = output;
-}
-
-function secToTime(sec){
-    let h = Math.floor(sec/3600);
-    let m = Math.floor((sec%3600)/60);
-    let s = Math.floor(sec%60);
-    if(h>0) return `${h}h ${m.toString().padStart(2,"0")}m ${s.toString().padStart(2,"0")}s`;
-    return `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
 }
 </script>
 </body>
