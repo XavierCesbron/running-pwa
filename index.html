@@ -117,15 +117,15 @@
 <header>Running Calculator</header>
 
 <div id="page1" class="page active">
-  <!-- contenu inchangé -->
+  <!-- Contenu Course inchangé -->
 </div>
 
 <div id="page2" class="page">
-  <!-- contenu inchangé -->
+  <!-- Contenu Calcul Libre inchangé -->
 </div>
 
 <div id="page3" class="page">
-  <!-- contenu inchangé -->
+  <!-- Contenu Séance inchangé -->
 </div>
 
 <div id="page4" class="page">
@@ -163,6 +163,7 @@ function secToTime(sec){
     return `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
 }
 
+// --- Onglet Zones uniquement modifié ---
 function calculZones() {
     let vma = parseFloat(document.getElementById("vma").value);
     let fc = parseFloat(document.getElementById("fcmax").value);
@@ -185,9 +186,9 @@ function calculZones() {
         output += `<div class="zone-item" style="border-left-color:${z.c}"><div class="zone-title">${z.name}</div>`;
         output += `<div class="zone-data"><p>Vitesse : <span>${sMin.toFixed(1)}-${sMax.toFixed(1)} km/h</span></p>`;
         if(z.d){
+            // temps maximal en premier, minimal en second
             let tMax = aMax * z.d;
             let tMin = aMin * z.d;
-            // inversion temps: maximal en premier, minimal en second
             output += `<p>Temps : <span>${secToTime(tMax)} - ${secToTime(tMin)}</span></p>`;
         } else {
             output += `<p>Allure : <span>${secPerKmToAllure(aMax)}-${secPerKmToAllure(aMin)} min/km</span></p>`;
