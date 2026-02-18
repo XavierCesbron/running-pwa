@@ -1,121 +1,41 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Running PWA Calculator</title>
-
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#FC4C02" />
-
-  <style>
-    :root {
-      --strava-orange: #FC4C02;
-      --strava-light: #ff6628;
-      --strava-dark: #cc3c02;
-    }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding-bottom: 60px;
-    }
-    header {
-      background: var(--strava-orange);
-      color: white;
-      padding: 15px;
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .tab-bar {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      display: flex;
-      background: white;
-      border-top: 1px solid #ccc;
-      z-index: 10;
-    }
-    .tab {
-      flex: 1;
-      text-align: center;
-      padding: 12px 5px;
-      font-size: 13px;
-      cursor: pointer;
-      color: #777;
-    }
-    .tab.active {
-      color: var(--strava-orange);
-      font-weight: bold;
-      border-top: 3px solid var(--strava-orange);
-      margin-top: -3px;
-    }
-    .page {
-      display: none;
-      padding: 20px;
-      padding-bottom: 70px;
-    }
-    .page.active {
-      display: block;
-    }
-    .input-group {
-        background: white;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    }
-    label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-        color: #333;
-        font-size: 14px;
-    }
-    input[type="number"], input[type="text"], select {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0 15px 0;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box; 
-    }
-    button {
-      padding: 12px;
-      width: 100%;
-      background: var(--strava-orange);
-      border: none;
-      color: white;
-      font-size: 18px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .result {
-      margin-top: 20px;
-      padding: 15px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .result h3 { color: var(--strava-orange); margin-top: 0; }
-    .radio-container { display: flex; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; }
-    .radio-label { flex: 1; text-align: center; padding: 10px; background: #f9f9f9; cursor: pointer; font-size: 14px; }
-    .radio-input:checked + .radio-label { background: var(--strava-orange); color: white; }
-    .radio-input { display: none; }
-    .hidden-fields { display: none; }
-    .passages-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-    .passages-table th, .passages-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-    .zone-item { margin-bottom: 15px; padding: 10px; border-radius: 6px; background: #fff; border-left: 5px solid; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Running PWA Calculator</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#FC4C02" />
+<style>
+:root { --strava-orange: #FC4C02; --strava-light: #ff6628; --strava-dark: #cc3c02; }
+body { margin:0; font-family:Arial,sans-serif; background:#f5f5f5; padding-bottom:60px; }
+header { background:var(--strava-orange); color:white; padding:15px; text-align:center; font-size:20px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
+.tab-bar { position:fixed; bottom:0; width:100%; display:flex; background:white; border-top:1px solid #ccc; z-index:10; }
+.tab { flex:1; text-align:center; padding:12px 5px; font-size:13px; cursor:pointer; color:#777; }
+.tab.active { color:var(--strava-orange); font-weight:bold; border-top:3px solid var(--strava-orange); margin-top:-3px; }
+.page { display:none; padding:20px; padding-bottom:70px; }
+.page.active { display:block; }
+.input-group { background:white; padding:15px; margin-bottom:20px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.08);}
+label { display:block; margin-bottom:5px; font-weight:bold; color:#333; font-size:14px; }
+input[type="number"], input[type="text"], select { width:100%; padding:10px; margin:5px 0 15px 0; font-size:16px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; }
+button { padding:12px; width:100%; background:var(--strava-orange); border:none; color:white; font-size:18px; border-radius:4px; cursor:pointer; }
+.result { margin-top:20px; padding:15px; background:#fff; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+.result h3 { color:var(--strava-orange); margin-top:0;}
+.radio-container { display:flex; margin-bottom:15px; border:1px solid #ccc; border-radius:4px; overflow:hidden; }
+.radio-label { flex:1; text-align:center; padding:10px; background:#f9f9f9; cursor:pointer; font-size:14px; }
+.radio-input:checked + .radio-label { background:var(--strava-orange); color:white; }
+.radio-input { display:none; }
+.hidden-fields { display:none; }
+.passages-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:14px;}
+.passages-table th, .passages-table td { border:1px solid #ddd; padding:8px; text-align:center; }
+.zone-item { margin-bottom:15px; padding:10px; border-radius:6px; background:#fff; border-left:5px solid; }
+</style>
 </head>
-
 <body>
 
 <header>Running Calculator</header>
 
+<!-- Onglets -->
 <div id="page1" class="page active">
   <h2>Temps de passage (Course)</h2>
   <div class="input-group">
@@ -142,8 +62,7 @@
 
 <div id="page2" class="page">
   <h2>Calcul Libre (2 sur 3)</h2>
-  <p style="font-size: 0.85em; color: #666; margin-top: -10px; margin-bottom: 20px;">Remplissez 2 champs pour calculer le 3ème.</p>
-  
+  <p style="font-size:0.85em;color:#666;margin-top:-10px;margin-bottom:20px;">Remplissez 2 champs pour calculer le 3ème.</p>
   <div class="input-group">
     <label>Distance</label>
     <div style="display:flex; gap:10px;">
@@ -153,15 +72,12 @@
           <option value="m">m</option>
         </select>
     </div>
-
     <label>Temps (hh:mm:ss)</label>
     <input id="calc-time" type="text" placeholder="Ex: 00:45:00 ou 45:00" />
-
     <label>Vitesse (km/h) ou Allure (min/km)</label>
     <input id="calc-pace" type="text" placeholder="Ex: 12.5 ou 4:48" />
-
     <button onclick="calculLibre()">Calculer le manquant</button>
-    <button onclick="clearCalcLibre()" style="background:#999; margin-top:10px; font-size:14px;">Effacer les champs</button>
+    <button onclick="clearCalcLibre()" style="background:#999;margin-top:10px;font-size:14px;">Effacer les champs</button>
   </div>
   <div id="res-libre" class="result"></div>
 </div>
@@ -218,172 +134,46 @@
 </div>
 
 <script>
-// --- UTILS ---
-function allureToSecPerKm(val) {
-  if (!val) return 0;
-  val = val.toString().trim();
-  if (val.includes(':')) {
-    let p = val.split(':');
-    if(p.length === 2) return (parseInt(p[0]) * 60) + (parseInt(p[1]) || 0);
-    if(p.length === 3) return (parseInt(p[0]) * 3600) + (parseInt(p[1]) * 60) + (parseInt(p[2]) || 0);
-  }
-  let speed = parseFloat(val.replace(',','.'));
-  return speed > 0 ? 3600 / speed : 0;
-}
+// UTILS
+function allureToSecPerKm(val){ if(!val) return 0; val=val.toString().trim(); if(val.includes(':')){let p=val.split(':'); if(p.length===2)return p[0]*60+p[1]*1; if(p.length===3)return p[0]*3600+p[1]*60+p[2]*1;} let speed=parseFloat(val.replace(',','.')); return speed>0?3600/speed:0;}
+function secPerKmToAllure(sec){ if(sec<=0)return "0:00"; let m=Math.floor(sec/60); let s=Math.floor(sec%60).toString().padStart(2,"0"); return m+":"+s;}
+function secToTime(sec){ let h=Math.floor(sec/3600); let m=Math.floor((sec%3600)/60); let s=Math.floor(sec%60); if(h>0)return h+"h "+m.toString().padStart(2,"0")+"m "+s.toString().padStart(2,"0")+"s"; return m.toString().padStart(2,"0")+":"+s.toString().padStart(2,"0");}
 
-function timeToSec(val) {
-    if (!val || !val.includes(':')) return parseFloat(val.replace(',','.')) || 0;
-    let p = val.split(':').map(Number);
-    if (p.length === 3) return (p[0] * 3600) + (p[1] * 60) + p[2];
-    if (p.length === 2) return (p[0] * 60) + p[1];
-    return 0;
-}
+// Onglets
+function switchTab(n){ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active")); document.getElementById("page"+n).classList.add("active"); document.querySelectorAll(".tab")[n-1].classList.add("active"); }
+function toggleSeanceInput(type){ document.getElementById('fields-speed').style.display=(type==='speed')?'block':'none'; document.getElementById('fields-vma').style.display=(type==='vma')?'block':'none'; }
 
-function secPerKmToAllure(sec) {
-  if (sec <= 0) return "0:00";
-  let m = Math.floor(sec / 60);
-  let s = Math.floor(sec % 60).toString().padStart(2, "0");
-  return ${m}:${s};
-}
-
-function secToTime(sec) {
-    let h = Math.floor(sec / 3600);
-    let m = Math.floor((sec % 3600) / 60);
-    let s = Math.floor(sec % 60);
-    if (h > 0) return ${h}h ${m.toString().padStart(2,"0")}m ${s.toString().padStart(2,"0")}s;
-    return ${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")};
-}
-
-// --- TABS ---
-function switchTab(n) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  document.getElementById("page" + n).classList.add("active");
-  document.querySelectorAll(".tab")[n-1].classList.add("active");
-}
-
-function toggleSeanceInput(type) {
-    document.getElementById('fields-speed').style.display = (type === 'speed') ? 'block' : 'none';
-    document.getElementById('fields-vma').style.display = (type === 'vma') ? 'block' : 'none';
-}
-
-// --- CALCUL LIBRE (LOGIQUE 2/3) ---
-function calculLibre() {
-    let distVal = document.getElementById("calc-dist").value;
-    let unitDist = document.getElementById("calc-unit-dist").value;
-    let timeVal = document.getElementById("calc-time").value;
-    let paceVal = document.getElementById("calc-pace").value;
-    let res = document.getElementById("res-libre");
-
-    let d = distVal ? parseFloat(distVal) : 0;
-    if (unitDist === 'm' && d) d /= 1000;
-    let t = timeVal ? timeToSec(timeVal) : 0;
-    let p = paceVal ? allureToSecPerKm(paceVal) : 0;
-
-    let found = "";
-    if (d && t && !paceVal) {
-        p = t / d;
-        document.getElementById("calc-pace").value = secPerKmToAllure(p);
-        found = "Allure / Vitesse";
-    } else if (d && p && !timeVal) {
-        t = d * p;
-        document.getElementById("calc-time").value = secToTime(t).replace('h ',':').replace('m ',':').replace('s','');
-        found = "Temps";
-    } else if (t && p && !distVal) {
-        d = t / p;
-        document.getElementById("calc-dist").value = d.toFixed(2);
-        found = "Distance";
-    } else {
-        res.innerHTML = "⚠️ Remplissez exactement 2 champs.";
-        return;
+// Zones
+function calculZones(){
+  let vma=parseFloat(document.getElementById("vma").value);
+  let fc=parseFloat(document.getElementById("fcmax").value);
+  if(!vma)return;
+  const zones=[
+    { name:"Allure modérée / Récupération", min:50,max:60,fmin:60,fmax:65,c:"#4CAF50" },
+    { name:"Endurance fondamentale", min:60,max:70,fmin:65,fmax:75,c:"#8BC34A" },
+    { name:"Endurance active / Tempo", min:70,max:75,fmin:75,fmax:85,c:"#FFC107" },
+    { name:"Marathon", min:75,max:80,fmin:80,fmax:85,c:"#FF9800",d:42.195 },
+    { name:"Semi-marathon", min:80,max:85,fmin:85,fmax:90,c:"#FF5722",d:21.097 },
+    { name:"10km", min:85,max:90,fmin:90,fmax:93,c:"#F44336",d:10 },
+    { name:"5km", min:90,max:95,fmin:93,fmax:95,c:"#D32F2F",d:5 }
+  ];
+  let output="";
+  zones.forEach(z=>{
+    let sMin=vma*z.min/100, sMax=vma*z.max/100;
+    let aMin=3600/sMin, aMax=3600/sMax;
+    output+='<div class="zone-item" style="border-left-color:'+z.c+'"><div class="zone-title">'+z.name+'</div>';
+    output+='<div class="zone-data">';
+    output+='<p>Vitesse : <span>'+sMin.toFixed(1)+'-'+sMax.toFixed(1)+' km/h</span></p>';
+    output+='<p>Allure : <span>'+secPerKmToAllure(aMin)+'-'+secPerKmToAllure(aMax)+' min/km</span></p>';
+    if(z.d){ // calcul temps si distance définie
+      let tMax=aMin*z.d*1000/1000; // temps max = allure lente * distance
+      let tMin=aMax*z.d*1000/1000; // temps min = allure rapide * distance
+      output+='<p>Temps : <span>'+secToTime(tMax)+' → '+secToTime(tMin)+'</span></p>';
     }
-
-    res.innerHTML = <h3>Résultat : ${found} calculé</h3>
-        <b>Distance :</b> ${d.toFixed(2)} km<br>
-        <b>Temps :</b> ${secToTime(t)}<br>
-        <b>Allure :</b> ${secPerKmToAllure(p)} min/km<br>
-        <b>Vitesse :</b> ${(3600/p).toFixed(2)} km/h;
-}
-
-function clearCalcLibre() {
-    ["calc-dist", "calc-time", "calc-pace"].forEach(id => document.getElementById(id).value = "");
-    document.getElementById("res-libre").innerHTML = "";
-}
-
-// --- AUTRES CALCULS (Inchangés mais simplifiés pour la version) ---
-function calculCourse() {
-    let dist = parseFloat(document.getElementById("distance1").value);
-    if (document.getElementById("unit1").value === 'm') dist /= 1000;
-    let allureSec = allureToSecPerKm(document.getElementById("input-speed-pace1").value);
-    let interval = parseInt(document.getElementById("pace-interval").value);
-    if (!dist || !allureSec) return;
-    let output = <div class="result-section"><h3>Total : ${secToTime(dist * allureSec)}</h3>
-        Vitesse : ${(3600/allureSec).toFixed(1)} km/h | Allure : ${secPerKmToAllure(allureSec)}</div>;
-    output += <table class="passages-table"><tr><th>km</th><th>Temps</th></tr>;
-    for(let i=interval; i<=dist; i+=interval) { output += <tr><td>${i}</td><td>${secToTime(i * allureSec)}</td></tr>; }
-    document.getElementById("res1").innerHTML = output + "</table>";
-}
-
-function calculSeance() {
-    let dist = parseFloat(document.getElementById("distance2").value);
-    if (document.getElementById("unit2").value === 'km') dist *= 1000;
-    let allureSec = 0;
-    let type = document.querySelector('input[name="seance-type"]:checked').value;
-    if (type === 'speed') allureSec = allureToSecPerKm(document.getElementById("input-speed-pace2").value);
-    else {
-        let vma = parseFloat(document.getElementById("vma-seance").value);
-        let pct = parseFloat(document.getElementById("percent-vma-seance").value);
-        if (vma && pct) allureSec = 3600 / (vma * pct / 100);
-    }
-    if (!dist || !allureSec) return;
-    let total = (dist / 1000) * allureSec;
-    let output = <div class="result-section"><h3>Cible : ${secToTime(total)}</h3>
-        Vitesse : ${(3600/allureSec).toFixed(1)} km/h</div><table class="passages-table">;
-    [100, 200, 300, 400].forEach(d => {
-        let s = (d/1000) * allureSec;
-        output += <tr><td>${d}m</td><td>${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,"0")}.${Math.floor((s%1)*10)}</td></tr>;
-    });
-    document.getElementById("res2").innerHTML = output + "</table>";
-}
-
-function calculZones() {
-    let vma = parseFloat(document.getElementById("vma").value);
-    let fc = parseFloat(document.getElementById("fcmax").value);
-    if (!vma) return;
-    const zones = [
-        { name: "Allure modérée / Récupération", min: 50, max: 60, fmin: 60, fmax: 65, c: "#4CAF50" },
-        { name: "Endurance fondamentale", min: 60, max: 70, fmin: 65, fmax: 75, c: "#8BC34A" },
-        { name: "Endurance active / Tempo", min: 70, max: 75, fmin: 75, fmax: 85, c: "#FFC107" },
-        { name: "Marathon", min: 75, max: 80, fmin: 80, fmax: 85, c: "#FF9800", d: 42.195 },
-        { name: "Semi-marathon", min: 80, max: 85, fmin: 85, fmax: 90, c: "#FF5722", d: 21.097 },
-        { name: "10km", min: 85, max: 90, fmin: 90, fmax: 93, c: "#F44336", d: 10 },
-        { name: "5km", min: 90, max: 95, fmin: 93, fmax: 95, c: "#D32F2F", d: 5 }
-    ];
-    let output = "";
-    zones.forEach(z => {
-        let sMin = vma * z.min / 100, sMax = vma * z.max / 100;
-        let aMin = 3600 / sMin, aMax = 3600 / sMax;
-        output += <div class="zone-item" style="border-left-color:${z.c}"><div class="zone-title">${z.name}</div>;
-        output += <div class="zone-data"><p>Vitesse : <span>${sMin.toFixed(1)}-${sMax.toFixed(1)} km/h</span></p>;
-        output += <p>Allure : <span>${secPerKmToAllure(aMin)}-${secPerKmToAllure(aMax)} min/km</span></p>;
-        if (fc) output += <p>FC : <span>${Math.round(fc*z.fmin/100)}-${Math.round(fc*z.fmax/100)} bpm</span></p>;
-        output += </div></div>;
-    });
-    document.getElementById("res3").innerHTML = output;
-}
-
-// Service Worker (Auto-update)
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js").then(reg => {
-    reg.onupdatefound = () => {
-      const installingWorker = reg.installing;
-      installingWorker.onstatechange = () => {
-        if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-          window.location.reload();
-        }
-      };
-    };
+    if(fc) output+='<p>FC : <span>'+Math.round(fc*z.fmin/100)+'-'+Math.round(fc*z.fmax/100)+' bpm</span></p>';
+    output+='</div></div>';
   });
+  document.getElementById("res3").innerHTML=output;
 }
 </script>
 </body>
