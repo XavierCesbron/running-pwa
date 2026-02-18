@@ -350,6 +350,7 @@ function calculZones() {
     let vma = parseFloat(document.getElementById("vma").value);
     let fc = parseFloat(document.getElementById("fcmax").value);
     if (!vma) return;
+
     const zones = [
         { name: "Allure modérée / Récupération", min: 50, max: 60, fmin: 60, fmax: 65, c: "#4CAF50" },
         { name: "Endurance fondamentale", min: 60, max: 70, fmin: 65, fmax: 75, c: "#8BC34A" },
@@ -359,16 +360,39 @@ function calculZones() {
         { name: "10km", min: 85, max: 90, fmin: 90, fmax: 93, c: "#F44336", d: 10 },
         { name: "5km", min: 90, max: 95, fmin: 93, fmax: 95, c: "#D32F2F", d: 5 }
     ];
+
     let output = "";
+
     zones.forEach(z => {
-        let sMin = vma * z.min / 100, sMax = vma * z.max / 100;
-        let aMin = 3600 / sMin, aMax = 3600 / sMax;
-        output += <div class="zone-item" style="border-left-color:${z.c}"><div class="zone-title">${z.name}</div>;
-        output += <div class="zone-data"><p>Vitesse : <span>${sMin.toFixed(1)}-${sMax.toFixed(1)} km/h</span></p>;
-        output += <p>Allure : <span>${secPerKmToAllure(aMin)}-${secPerKmToAllure(aMax)} min/km</span></p>;
-        if (fc) output += <p>FC : <span>${Math.round(fc*z.fmin/100)}-${Math.round(fc*z.fmax/100)} bpm</span></p>;
-        output += </div></div>;
+
+        let sMin = vma * z.min / 100;
+        let sMax = vma * z.max / 100;
+
+        let aMin = 3600 / sMin;
+        let aMax = 3600 / sMax;
+
+        output += `<div class="zone-item" style="border-left-color:${z.c}">
+        <div class="zone-title">${z.name}</div>
+        <div class="zone-data">
+        <p>Vitesse : <span>${sMin.toFixed(1)} - ${sMax.toFixed(1)} km/h</span></p>
+        <p>Allure : <span>${secPerKmToAllure(aMin)} - ${secPerKmToAllure(aMax)} min/km</span></p>`;
+
+        if (fc) {
+            output += `<p>FC : <span>${Math.round(fc*z.fmin/100)} - ${Math.round(fc*z.fmax/100)} bpm</span></p>`;
+        }
+
+        // 🔹 AJOUT UNIQUEMENT POUR LES DISTANCES COURSE
+        if (z.d) {
+
+            let timeMax = z.d * aMin; // vitesse la plus basse
+            let timeMin = z.d * aMax; // vitesse la plus haute
+
+            output += `<p>Temps estimé : <span>${secToTime(timeMax)} - ${secToTime(timeMin)}</span></p>`;
+        }
+
+        output += `</div></div>`;
     });
+
     document.getElementById("res3").innerHTML = output;
 }
 
